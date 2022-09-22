@@ -1,0 +1,4 @@
+
+var list1 : [int] = [3, 5, 7];
+list1 ++ 100;
+print(list1[3]);

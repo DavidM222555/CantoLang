@@ -39,6 +39,18 @@ public class CantoBaseListener implements CantoListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterListConcat(CantoParser.ListConcatContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitListConcat(CantoParser.ListConcatContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterIf(CantoParser.IfContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -118,6 +130,30 @@ public class CantoBaseListener implements CantoListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitImmutVarDecl(CantoParser.ImmutVarDeclContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterImmutListDecl(CantoParser.ImmutListDeclContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitImmutListDecl(CantoParser.ImmutListDeclContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterMutListDecl(CantoParser.MutListDeclContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMutListDecl(CantoParser.MutListDeclContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -22,6 +22,12 @@ public interface CantoVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStatement(CantoParser.StatementContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link CantoParser#listConcat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitListConcat(CantoParser.ListConcatContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link CantoParser#if}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -63,6 +69,18 @@ public interface CantoVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitImmutVarDecl(CantoParser.ImmutVarDeclContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link CantoParser#immutListDecl}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitImmutListDecl(CantoParser.ImmutListDeclContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link CantoParser#mutListDecl}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMutListDecl(CantoParser.MutListDeclContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link CantoParser#funcDecl}.
 	 * @param ctx the parse tree

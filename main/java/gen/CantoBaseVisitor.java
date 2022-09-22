@@ -30,6 +30,13 @@ public class CantoBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements 
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitListConcat(CantoParser.ListConcatContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitIf(CantoParser.IfContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
@@ -73,6 +80,20 @@ public class CantoBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements 
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitImmutVarDecl(CantoParser.ImmutVarDeclContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitImmutListDecl(CantoParser.ImmutListDeclContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitMutListDecl(CantoParser.MutListDeclContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

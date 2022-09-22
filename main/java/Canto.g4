@@ -8,11 +8,15 @@ statement   : block
             | varDecl
             | funcDecl
             | if
+            | listConcat
             | expr ';'
             | while
             | until
             | return
             | print
+            ;
+
+listConcat  : ID '++' expr ';'
             ;
 
 if          :
@@ -30,12 +34,24 @@ assign      : ID '=' expr ';'
 
 
 varDecl     : mutVarDecl
-            | immutVarDecl ;
+            | immutVarDecl
+            | immutListDecl
+            | mutListDecl
+            ;
 
 
 mutVarDecl  : 'let' ID ':' type '=' expr ';' ;
 
-immutVarDecl: 'set' ID ':' type '=' expr ';' ;
+immutVarDecl
+            : 'var' ID ':' type '=' expr ';' ;
+
+immutListDecl
+            : 'let' ID ':' '[' type ']' '=' '[' exprList? ']' ';'
+            ;
+
+mutListDecl
+            : 'var' ID  ':' '[' type ']' '=' '[' exprList? ']' ';'
+            ;
 
 funcDecl    : 'func' ID '(' argList? ')' '->' type block ;
 
@@ -46,7 +62,6 @@ argList     : arg (',' arg)*
 arg         : ID ':' type ;
 
 block       : '{' statement* '}' ;
-
 
 print
             : 'print' '(' expr ')' ';';
@@ -59,7 +74,7 @@ until
 
 
 expr        : ID '(' exprList? ')'  # Call
-            | expr '[' expr ']'     # Index
+            | ID '[' INT ']'        # Index
             | '-' expr              # Negate
             | 'not' expr            # Not
             | expr '*' expr         # Mult
@@ -84,6 +99,7 @@ expr        : ID '(' exprList? ')'  # Call
             | '(' expr ')'          # Parens
             ;
 
+
 exprList    : expr (',' expr)* ;
 
 return      : 'return' expr ';';
@@ -93,6 +109,7 @@ type        : 'float'
             | 'bool'
             | 'char'
             | 'string'
+            | ID // For handling new user defined types
             ;
 
 bool        : 'true'

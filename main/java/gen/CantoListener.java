@@ -27,6 +27,16 @@ public interface CantoListener extends ParseTreeListener {
 	 */
 	void exitStatement(CantoParser.StatementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link CantoParser#listConcat}.
+	 * @param ctx the parse tree
+	 */
+	void enterListConcat(CantoParser.ListConcatContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CantoParser#listConcat}.
+	 * @param ctx the parse tree
+	 */
+	void exitListConcat(CantoParser.ListConcatContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link CantoParser#if}.
 	 * @param ctx the parse tree
 	 */
@@ -96,6 +106,26 @@ public interface CantoListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitImmutVarDecl(CantoParser.ImmutVarDeclContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link CantoParser#immutListDecl}.
+	 * @param ctx the parse tree
+	 */
+	void enterImmutListDecl(CantoParser.ImmutListDeclContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CantoParser#immutListDecl}.
+	 * @param ctx the parse tree
+	 */
+	void exitImmutListDecl(CantoParser.ImmutListDeclContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link CantoParser#mutListDecl}.
+	 * @param ctx the parse tree
+	 */
+	void enterMutListDecl(CantoParser.MutListDeclContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CantoParser#mutListDecl}.
+	 * @param ctx the parse tree
+	 */
+	void exitMutListDecl(CantoParser.MutListDeclContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link CantoParser#funcDecl}.
 	 * @param ctx the parse tree

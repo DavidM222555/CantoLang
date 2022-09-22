@@ -36,8 +36,6 @@ public class Function {
         for (int i = 0; i < params.size(); i++) {
             VarSymbol value = new VarSymbol(params.get(i).getName(), params.get(i).getType());
 
-            System.out.println("Object value: " + args.get(i));
-
             value.setObjectValue(args.get(i));
 
             funcScope.define(value);
@@ -52,7 +50,6 @@ public class Function {
         try {
             funcCallVisitor.visit(block);
         } catch (ReturnValue ret) {
-            System.out.println("Returning now!");
             returnValue = ret.value;
         }
 

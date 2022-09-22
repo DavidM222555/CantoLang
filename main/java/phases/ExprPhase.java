@@ -8,6 +8,7 @@ import gen.CantoParser;
 import scopes.GlobalScope;
 import scopes.LocalScope;
 import scopes.Scope;
+import symbols.Symbol;
 import symbols.VarSymbol;
 
 import java.util.*;
@@ -122,7 +123,12 @@ public class ExprPhase extends CantoBaseVisitor {
     public Object visitPrint(CantoParser.PrintContext ctx) {
         var result = visit(ctx.expr());
 
-        System.out.println(result.toString());
+        if (result == null) {
+            System.out.println("None");
+            return null;
+        }
+
+        System.out.println(result);
 
         return null;
     }
@@ -155,6 +161,46 @@ public class ExprPhase extends CantoBaseVisitor {
 
             condition = Boolean.parseBoolean(visit(ctx.expr()).toString());
         }
+
+        return null;
+    }
+
+    public Object visitImmutListDecl(CantoParser.ImmutListDeclContext ctx) {
+        var values = visitExprList(ctx.exprList());
+        var type = "list";
+
+        Symbol immutList = new Symbol(ctx.ID().getText(), type);
+        immutList.setObjectValue(values);
+        currentScope.define(immutList);
+
+        return values;
+    }
+
+    public Object visitMutListDecl(CantoParser.MutListDeclContext ctx) {
+        var values = visitExprList(ctx.exprList());
+        var type = "list";
+
+        Symbol mutList = new Symbol(ctx.ID().getText(), type);
+        mutList.setObjectValue(values);
+
+        currentScope.define(mutList);
+
+        return values;
+    }
+
+    public Object visitListConcat(CantoParser.ListConcatContext ctx) {
+        var listSymbol = currentScope.resolve(ctx.ID().toString());
+        var listObj = listSymbol.getValue();
+
+        if (!(listObj instanceof List)) {
+            System.out.println("Object must be a list");
+            return null;
+        }
+
+        List<Object> listToUse = (List<Object>) listObj;
+        var objectToAdd = visit(ctx.expr());
+
+        listToUse.add(objectToAdd);
 
         return null;
     }
@@ -205,9 +251,7 @@ public class ExprPhase extends CantoBaseVisitor {
         var functionToCall = functions.get(ctx.ID().getText());
         var params = visitExprList(ctx.exprList());
 
-        var funcReturn = functionToCall.invoke(params, functions);
-
-        return funcReturn;
+        return functionToCall.invoke(params, functions);
     }
 
     /**
@@ -277,6 +321,8 @@ public class ExprPhase extends CantoBaseVisitor {
             System.out.println("Modulus must have integer arguments");
         }
 
+        assert leftSide instanceof Integer;
+        assert rightSide instanceof Integer;
         return (Integer)leftSide % (Integer)rightSide;
     }
 
@@ -398,9 +444,30 @@ public class ExprPhase extends CantoBaseVisitor {
         return leftSide.equals(rightSide);
     }
 
+    public Object visitIndex(CantoParser.IndexContext ctx) {
+        int index = Integer.parseInt(ctx.INT().getText());
+
+        var listSymbol = currentScope.resolve(ctx.ID().toString());
+        var listObj = listSymbol.getValue();
+
+        if (!(listObj instanceof List)) {
+            System.out.println("Object must be a list");
+            return null;
+        }
+
+        var listToUse = ((List<?>) listObj);
+
+        if (listToUse.size() <= index || index < 0) {
+            System.out.println("Invalid index for list of size: " + listToUse.size());
+            return null;
+        }
+
+        return listToUse.get(index);
+    }
+
     /**
      * Visits a variable in our symbol table and gets its value. In here we also take consideration
-     * of the value's type so we can correctly cast it.
+     * of the value's type, so we can correctly cast it.
      * @return The value associated with the variable.
      */
     public Object visitVar(CantoParser.VarContext ctx) {
