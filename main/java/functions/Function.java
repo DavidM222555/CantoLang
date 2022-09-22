@@ -43,9 +43,16 @@ public class Function {
 
         ExprPhase funcCallVisitor = new ExprPhase(funcScope, functions);
 
-        funcCallVisitor.visit(block);
+        Object returnValue = null;
 
-        return null;
+        try {
+            funcCallVisitor.visit(block);
+        } catch (ReturnValue ret) {
+            System.out.println("Returning now!");
+            returnValue = ret.value;
+        }
+
+        return returnValue;
     }
 
 }

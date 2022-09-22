@@ -86,7 +86,7 @@ expr        : ID '(' exprList? ')'  # Call
 
 exprList    : expr (',' expr)* ;
 
-return      : 'return' expr ;
+return      : 'return' expr ';';
 
 type        : 'float'
             | 'int'

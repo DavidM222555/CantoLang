@@ -2,6 +2,7 @@ package phases;
 
 import com.sun.jdi.Value;
 import functions.Function;
+import functions.ReturnValue;
 import gen.CantoBaseVisitor;
 import gen.CantoParser;
 import scopes.GlobalScope;
@@ -15,6 +16,8 @@ import java.util.*;
 public class ExprPhase extends CantoBaseVisitor {
     GlobalScope globals;
     Scope currentScope;
+
+    static ReturnValue retvalue = new ReturnValue();
 
     Map<String, Function> functions = new HashMap<>();
 
@@ -74,6 +77,15 @@ public class ExprPhase extends CantoBaseVisitor {
         return null;
     }
 
+    public Object visitReturn(CantoParser.ReturnContext ctx) {
+        System.out.println("Attempting to return");
+
+        Object returnObject = visit(ctx.expr());
+
+        retvalue.value = returnObject;
+
+        throw retvalue;
+    }
 
     public Value visitBlock(CantoParser.BlockContext ctx) {
         // Create a new scope for the block
@@ -163,9 +175,9 @@ public class ExprPhase extends CantoBaseVisitor {
         var functionToCall = functions.get(ctx.ID().getText());
         var params = visitExprList(ctx.exprList());
 
-        functionToCall.invoke(params, functions);
+        var funcReturn = functionToCall.invoke(params, functions);
 
-        return null;
+        return funcReturn;
     }
 
     public List<Object> visitExprList(CantoParser.ExprListContext ctx) {
@@ -220,6 +232,21 @@ public class ExprPhase extends CantoBaseVisitor {
 
     public Integer visitMult(CantoParser.MultContext ctx) {
         return (Integer)visit(ctx.expr(0)) * (Integer)visit(ctx.expr(1));
+    }
+
+    public Integer visitMod(CantoParser.ModContext ctx) {
+        var leftSide = visit(ctx.expr(0));
+        var rightSide = visit(ctx.expr(1));
+
+        if (!(leftSide instanceof Integer)) {
+            System.out.println("Modulus must have integer arguments");
+        }
+
+        if (!(rightSide instanceof Integer)) {
+            System.out.println("Modulus must have integer arguments");
+        }
+
+        return (Integer)leftSide % (Integer)rightSide;
     }
 
     public Integer visitSub(CantoParser.SubContext ctx) {
