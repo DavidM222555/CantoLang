@@ -8,7 +8,6 @@ import gen.CantoParser;
 import scopes.GlobalScope;
 import scopes.LocalScope;
 import scopes.Scope;
-import symbols.FunctionSymbol;
 import symbols.VarSymbol;
 
 import java.util.*;
@@ -17,18 +16,26 @@ public class ExprPhase extends CantoBaseVisitor {
     GlobalScope globals;
     Scope currentScope;
 
+    // This will be called if we encounter a return statement
+    // and throw it up to the calling Function class
     static ReturnValue retvalue = new ReturnValue();
 
+    // Used for tracking names to functions
     Map<String, Function> functions = new HashMap<>();
 
     public ExprPhase() {}
 
+    // This constructor will be utilized by Function to
+    // give a current scope and the set of current functions
     public ExprPhase(Scope currentScope, Map<String, Function> functions) {
         this.currentScope = currentScope;
         this.functions = functions;
     }
 
-
+    /**
+     * Starting point of our program
+     * @return Return 0 if success, anything else is failure
+     */
     public Integer visitFile(CantoParser.FileContext ctx) {
         this.globals = new GlobalScope(null);
         this.currentScope = globals;
@@ -40,21 +47,31 @@ public class ExprPhase extends CantoBaseVisitor {
         return 0;
     }
 
-
+    /**
+     * Simply visits children statements and follows their rules
+     */
     public Value visitStatement(CantoParser.StatementContext ctx) {
         visitChildren(ctx);
 
         return null;
     }
 
+    /**
+     * There are two types of variable declaration, both of which have rules declared below.
+     * There is the mutable var and immutable let.
+     */
     public Value visitVarDecl(CantoParser.VarDeclContext ctx) {
         visitChildren(ctx);
 
         return null;
     }
 
-    public Value visitAssign(CantoParser.AssignContext ctx) {
-        var variableToChangeName = currentScope.resolve(ctx.ID().getText());
+    /**
+     * Used for resetting a variable's value. Eventually mutability checking will
+     * be added.
+     * Has the form x = expr where x is currently a variable in the symbol table.
+     */
+    public Object visitAssign(CantoParser.AssignContext ctx) {
         var exprValue = visit(ctx.expr());
 
         var symbolToChange = currentScope.resolve(ctx.ID().getText());
@@ -77,12 +94,13 @@ public class ExprPhase extends CantoBaseVisitor {
         return null;
     }
 
+    /**
+     * Currently the program handles return statements by throwing an error and then
+     * having them caught in the invoke function method.
+     * @return Nothing. Throws an exception if encountered.
+     */
     public Object visitReturn(CantoParser.ReturnContext ctx) {
-        System.out.println("Attempting to return");
-
-        Object returnObject = visit(ctx.expr());
-
-        retvalue.value = returnObject;
+        retvalue.value = visit(ctx.expr());
 
         throw retvalue;
     }
@@ -98,6 +116,9 @@ public class ExprPhase extends CantoBaseVisitor {
         return null;
     }
 
+    /**
+     * Simple method for printing the expression found within print()
+     */
     public Object visitPrint(CantoParser.PrintContext ctx) {
         var result = visit(ctx.expr());
 
@@ -106,9 +127,12 @@ public class ExprPhase extends CantoBaseVisitor {
         return null;
     }
 
-
-    public Value visitWhile(CantoParser.WhileContext ctx) {
-
+    /**
+     * Implementation of while loop in language. Get the condition that is
+     * represented in the expression and continue executing the block of code
+     * attached to it until the condition is no longer met.
+     */
+    public Object visitWhile(CantoParser.WhileContext ctx) {
         boolean condition = Boolean.parseBoolean(visit(ctx.expr()).toString());
 
         while (condition) {
@@ -120,6 +144,9 @@ public class ExprPhase extends CantoBaseVisitor {
         return null;
     }
 
+    /**
+     * Until is simply just while (not cond)
+     */
     public Object visitUntil(CantoParser.UntilContext ctx) {
         boolean condition = Boolean.parseBoolean(visit(ctx.expr()).toString());
 
@@ -132,18 +159,13 @@ public class ExprPhase extends CantoBaseVisitor {
         return null;
     }
 
+    /**
+     * Declares a function.
+     */
     public Object visitFuncDecl(CantoParser.FuncDeclContext ctx) {
-        System.out.println("Defining function");
-
         String funcName = ctx.ID().getText();
 
-        List<VarSymbol> params = new ArrayList<>();
-
         var argList = visitArgList(ctx.argList());
-
-        for(int i = 0; i < argList.size(); i++) {
-            System.out.println(argList.get(i).getName());
-        }
 
         // Define the new function and put it in our functions map
         Function newFunction = new Function(currentScope, argList, ctx.block());
@@ -152,6 +174,10 @@ public class ExprPhase extends CantoBaseVisitor {
         return null;
     }
 
+    /**
+     * Gather all the arguments to a function call
+     * @return A list of symbols that represent our arguments
+     */
     public List<VarSymbol> visitArgList(CantoParser.ArgListContext ctx) {
         List<VarSymbol> arguments = new ArrayList<>();
 
@@ -167,6 +193,10 @@ public class ExprPhase extends CantoBaseVisitor {
         return arguments;
     }
 
+    /**
+     * Used for invoking a function.
+     * @return Any return value that is thrown during execution
+     */
     public Object visitCall(CantoParser.CallContext ctx) {
         if (!functions.containsKey(ctx.ID().getText())) {
             System.out.println("Function not defined");
@@ -180,13 +210,14 @@ public class ExprPhase extends CantoBaseVisitor {
         return funcReturn;
     }
 
+    /**
+     * @return Returns a list of objects that are the evaluated expressions
+     */
     public List<Object> visitExprList(CantoParser.ExprListContext ctx) {
         List<Object> exprList = new ArrayList<>();
 
         for (int i = 0; i < ctx.expr().size(); i++) {
             var exprToAdd = visit(ctx.expr(i));
-
-            System.out.println("Expression we are adding: " + exprToAdd.toString());
 
             exprList.add(exprToAdd.toString());
         }
@@ -258,7 +289,6 @@ public class ExprPhase extends CantoBaseVisitor {
     }
 
     public Boolean visitBool(CantoParser.BoolContext ctx) {
-
         if (ctx.getText().equals("true")) {
             return Boolean.TRUE;
         }
@@ -281,6 +311,12 @@ public class ExprPhase extends CantoBaseVisitor {
         return leftSide || rightSide;
     }
 
+    /**
+     * Evaluates an if-elseif-else expression. First it checks if the if condition is met, if it is then it visits
+     * the statement/block associated with it. From there it iterates through all else-if statements and tests if any
+     * of those conditions are met, if they are it executes those blocks. From there, if none of the conditions have
+     * been satisfied then it always visits else's block.
+     */
     public Object visitIf(CantoParser.IfContext ctx) {
         Object resultOfExpr = visit(ctx.expr());
 
@@ -362,6 +398,11 @@ public class ExprPhase extends CantoBaseVisitor {
         return leftSide.equals(rightSide);
     }
 
+    /**
+     * Visits a variable in our symbol table and gets its value. In here we also take consideration
+     * of the value's type so we can correctly cast it.
+     * @return The value associated with the variable.
+     */
     public Object visitVar(CantoParser.VarContext ctx) {
         var value = currentScope.resolve(ctx.ID().getText());
 

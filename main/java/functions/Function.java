@@ -17,11 +17,13 @@ public class Function {
     public Scope enclosingScope;
     public List<VarSymbol> params;
     public ParseTree block;
+    public String returnType;
 
     public Function(Scope enclosingScope, List<VarSymbol> params, ParseTree block) {
         this.enclosingScope = enclosingScope;
         this.params = params;
         this.block = block;
+        this.returnType = "void";
     }
 
     public Object invoke(List<Object> args, Map<String, Function> functions) {
@@ -44,6 +46,8 @@ public class Function {
         ExprPhase funcCallVisitor = new ExprPhase(funcScope, functions);
 
         Object returnValue = null;
+
+        // Add code in here for making sure we return the correct type
 
         try {
             funcCallVisitor.visit(block);
