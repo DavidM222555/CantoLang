@@ -1,0 +1,16 @@
+func sumMultiplesOf3and5toN(n: int) -> int {
+    let result : int = 0;
+    let counter : int = 0;
+
+    until(counter == n) {
+        if ((counter % 3 == 0) or (counter % 5 == 0)) {
+            result = result + counter;
+        }
+
+        counter = counter + 1;
+    }
+
+    return result;
+}
+
+print(sumMultiplesOf3and5toN(1000));
