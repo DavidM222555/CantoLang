@@ -1,0 +1,10 @@
+
+func blue(arg1: int, arg2: string, arg3: string) -> int {
+    print(11 + arg1);
+
+    arg1 = arg1 + 12;
+
+    print(arg1);
+}
+
+blue(0 + 5, "blue", "hello");
