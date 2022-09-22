@@ -1,4 +1,4 @@
-# CantoLang
+# Canto
 Canto language is my way of exploring deeper into how interpreters and compilers work. This language was built using ANTLRv4 for Java, particularly the entire 
 lexer and parser were written/generated using ANTLR and the code is currently being interpreted using their visitor methods.
 
