@@ -6,6 +6,7 @@ lexer and parser were written/generated using ANTLR and the code is currently be
 - Support for mutable and immutable variables through the `var` and `let` keywords, respectively.
 - Scoping based off either global scope, function scope, or user defined blocks (`{ block }`)
 - Support for most of the basic imperative looping mechanisms (`while` and `for` loop) along with the interesting addition of `until` which is simply just `while (not cond)`. Obviously `if-else` are also supported.
+- Lists and list concatenation (uses the syntax `++`). Lists are declared using either `var x : [type] = [...];` for mutable lists or `let x : [type] = [...];` for the case of immutable lists.
 
 
 ## Planned Features
