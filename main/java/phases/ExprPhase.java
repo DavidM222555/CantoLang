@@ -1,5 +1,6 @@
 package phases;
 
+import classes.Class;
 import com.sun.jdi.Value;
 import functions.Function;
 import functions.ReturnValue;
@@ -8,6 +9,7 @@ import gen.CantoParser;
 import scopes.GlobalScope;
 import scopes.LocalScope;
 import scopes.Scope;
+import symbols.ListSymbol;
 import symbols.Symbol;
 import symbols.VarSymbol;
 
@@ -23,6 +25,7 @@ public class ExprPhase extends CantoBaseVisitor {
 
     // Used for tracking names to functions
     Map<String, Function> functions = new HashMap<>();
+    Map<String, Class> classes = new HashMap<>();
 
     public ExprPhase() {}
 
@@ -73,6 +76,7 @@ public class ExprPhase extends CantoBaseVisitor {
      * Has the form x = expr where x is currently a variable in the symbol table.
      */
     public Object visitAssign(CantoParser.AssignContext ctx) {
+
         var exprValue = visit(ctx.expr());
 
         var symbolToChange = currentScope.resolve(ctx.ID().getText());
@@ -86,11 +90,32 @@ public class ExprPhase extends CantoBaseVisitor {
 
     public Value visitMutVarDecl(CantoParser.MutVarDeclContext ctx) {
         String varType = ctx.type().getText();
+
         VarSymbol newVar = new VarSymbol(ctx.ID().getText(), varType);
         var returnedValue = visit(ctx.expr());
-
         newVar.setObjectValue(returnedValue);
+
         currentScope.define(newVar);
+
+        return null;
+    }
+
+    public Object visitForRange(CantoParser.ForRangeContext ctx) {
+        var start = (Integer) visit(ctx.expr(0));
+        var end = (Integer) visit(ctx.expr(1));
+        var by = 1;
+
+        var newSymbol = new VarSymbol(ctx.ID().getText(), "int");
+        currentScope.define(newSymbol);
+
+        if (ctx.expr(2) != null) {
+            by = (Integer) visit(ctx.expr(2));
+        }
+
+        for (int i = start; i <= end; i += by) {
+            newSymbol.setObjectValue(i);
+            visit(ctx.statement());
+        }
 
         return null;
     }
@@ -109,9 +134,7 @@ public class ExprPhase extends CantoBaseVisitor {
     public Value visitBlock(CantoParser.BlockContext ctx) {
         // Create a new scope for the block
         currentScope = new LocalScope(currentScope);
-
         visitChildren(ctx);
-
         currentScope = currentScope.getEnclosingScope();
 
         return null;
@@ -124,7 +147,7 @@ public class ExprPhase extends CantoBaseVisitor {
         var result = visit(ctx.expr());
 
         if (result == null) {
-            System.out.println("None");
+            System.out.println("Null");
             return null;
         }
 
@@ -167,10 +190,11 @@ public class ExprPhase extends CantoBaseVisitor {
 
     public Object visitImmutListDecl(CantoParser.ImmutListDeclContext ctx) {
         var values = visitExprList(ctx.exprList());
-        var type = "list";
+        var listType = "list" + "[" + ctx.type().getText() + "]";
 
-        Symbol immutList = new Symbol(ctx.ID().getText(), type);
+        Symbol immutList = new ListSymbol(ctx.ID().getText(), ctx.type().getText(), listType, new ArrayList<Object>());
         immutList.setObjectValue(values);
+
         currentScope.define(immutList);
 
         return values;
@@ -178,14 +202,63 @@ public class ExprPhase extends CantoBaseVisitor {
 
     public Object visitMutListDecl(CantoParser.MutListDeclContext ctx) {
         var values = visitExprList(ctx.exprList());
-        var type = "list";
 
-        Symbol mutList = new Symbol(ctx.ID().getText(), type);
+        var listType = "list" + "[" + ctx.type().getText() + "]";
+
+        Symbol mutList = new ListSymbol(ctx.ID().getText(), ctx.type().getText(), listType, new ArrayList<Object>());
         mutList.setObjectValue(values);
 
         currentScope.define(mutList);
 
         return values;
+    }
+
+    public Object visitClassDecl(CantoParser.ClassDeclContext ctx) {
+        String className = ctx.ID().getText();
+
+        if(classes.containsKey(className)) {
+            System.out.println("Class " + className + " is already defined");
+            return null;
+        }
+
+        Class newClass = new Class();
+
+        for (int i = 0; i < ctx.children.size(); i++) {
+            if (ctx.children.get(i) instanceof CantoParser.ClassVarDeclContext) {
+                Object value = null;
+                var memberVariable = (CantoParser.ClassVarDeclContext) ctx.children.get(i);
+
+                newClass.definePublicMember(memberVariable.ID().getText(), value);
+            }
+            else if (ctx.children.get(i) instanceof CantoParser.ClassVarInitContext) {
+                String varName = String.valueOf(((CantoParser.ClassVarInitContext) ctx.children.get(i)).ID());
+                Object value = visit(ctx.children.get(i));
+
+                newClass.definePublicMember(varName, value);
+            }
+            else if (ctx.children.get(i) instanceof CantoParser.ClassMethodContext) {
+                System.out.println("Defining a method");
+            }
+        }
+
+        return null;
+    }
+
+    public Object visitClassVarInit(CantoParser.ClassVarInitContext ctx) {
+        return visit(ctx.expr());
+    }
+
+    public Object visitClassVar(CantoParser.ClassVarContext ctx, Class classToModify) {
+        System.out.println("Going to define a class variable here");
+
+        return null;
+    }
+
+
+    public Object visitClassMethod(CantoParser.ClassMethodContext ctx, Class classToModify) {
+        System.out.println("Going to define a class method here");
+
+        return null;
     }
 
     public Object visitListConcat(CantoParser.ListConcatContext ctx) {
@@ -244,6 +317,7 @@ public class ExprPhase extends CantoBaseVisitor {
      * @return Any return value that is thrown during execution
      */
     public Object visitCall(CantoParser.CallContext ctx) {
+
         if (!functions.containsKey(ctx.ID().getText())) {
             System.out.println("Function not defined");
         }
@@ -251,14 +325,22 @@ public class ExprPhase extends CantoBaseVisitor {
         var functionToCall = functions.get(ctx.ID().getText());
         var params = visitExprList(ctx.exprList());
 
-        return functionToCall.invoke(params, functions);
+        var returnValue = functionToCall.invoke(params, functions);
+
+        return returnValue;
     }
 
     /**
      * @return Returns a list of objects that are the evaluated expressions
      */
     public List<Object> visitExprList(CantoParser.ExprListContext ctx) {
+
         List<Object> exprList = new ArrayList<>();
+
+        // Handle the case of an initial empty list
+        if (ctx == null) {
+            return exprList;
+        }
 
         for (int i = 0; i < ctx.expr().size(); i++) {
             var exprToAdd = visit(ctx.expr(i));
@@ -277,6 +359,29 @@ public class ExprPhase extends CantoBaseVisitor {
         String childString = ctx.getChild(0).getText();
 
         return childString.substring(1, childString.length() - 1);
+    }
+
+    public Object visitForEach(CantoParser.ForEachContext ctx) {
+        var listObj = currentScope.resolve(ctx.ID(1).getText()).getValue();
+
+        var iterationVariableName = ctx.ID(0).getText();
+        var iterationVariableType = currentScope.resolve(ctx.ID(1).getText()).getType();
+        var iterationVariable = new VarSymbol(iterationVariableName, iterationVariableType);
+
+        currentScope.define(iterationVariable);
+
+        if (!(listObj instanceof List<?>)) {
+            System.out.println("Not a list");
+            return null;
+        }
+
+        for (var iter : (List)listObj) {
+            iterationVariable.setObjectValue(iter);
+
+            visit(ctx.statement());
+        }
+
+        return null;
     }
 
     public String visitChar(CantoParser.CharContext ctx) {
@@ -304,9 +409,44 @@ public class ExprPhase extends CantoBaseVisitor {
 
     }
 
-
     public Integer visitMult(CantoParser.MultContext ctx) {
         return (Integer)visit(ctx.expr(0)) * (Integer)visit(ctx.expr(1));
+    }
+
+    public Object visitIncrement(CantoParser.IncrementContext ctx) {
+        var symbolToModify = currentScope.resolve(ctx.ID().getText());
+        var currentValue = (Integer) symbolToModify.getValue();
+
+        symbolToModify.setObjectValue(currentValue + (Integer) visit(ctx.expr()));
+
+        return null;
+    }
+
+    public Object visitListIndex(CantoParser.ListIndexContext ctx) {
+        var listSymbol = currentScope.resolve(ctx.ID().toString());
+        var listObj = listSymbol.getValue();
+        var index = Integer.parseInt(ctx.expr(0).getText());
+        var newValue = visit(ctx.expr(1));
+
+        if (!(listObj instanceof List)) {
+            System.out.println("Object must be a list");
+            return null;
+        }
+
+        List<Object> listToUse = (List<Object>) listObj;
+
+        listToUse.set(index, newValue);
+
+        return null;
+    }
+
+    public Object visitDecrement(CantoParser.DecrementContext ctx) {
+        var symbolToModify = currentScope.resolve(ctx.ID().getText());
+        var currentValue = (Integer) symbolToModify.getValue();
+
+        symbolToModify.setObjectValue(currentValue - (Integer) visit(ctx.expr()));
+
+        return null;
     }
 
     public Integer visitMod(CantoParser.ModContext ctx) {
@@ -451,7 +591,7 @@ public class ExprPhase extends CantoBaseVisitor {
         var listObj = listSymbol.getValue();
 
         if (!(listObj instanceof List)) {
-            System.out.println("Object must be a list");
+            System.out.println("Object must be a list!");
             return null;
         }
 
@@ -473,9 +613,21 @@ public class ExprPhase extends CantoBaseVisitor {
     public Object visitVar(CantoParser.VarContext ctx) {
         var value = currentScope.resolve(ctx.ID().getText());
 
+        if (value instanceof ListSymbol) {
+            System.out.println("In here handling list");
+
+            var list = value.getValue();
+
+            return (List) list;
+        }
+
         if (value == null) {
             System.out.println("Variable is not defined!");
             return null;
+        }
+
+        if (value.getValue() instanceof Integer) {
+            return Integer.valueOf(value.getValue().toString());
         }
 
         switch (value.getType()) {

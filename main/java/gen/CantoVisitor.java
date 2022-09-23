@@ -28,6 +28,64 @@ public interface CantoVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitListConcat(CantoParser.ListConcatContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link CantoParser#listIndex}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitListIndex(CantoParser.ListIndexContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link CantoParser#increment}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIncrement(CantoParser.IncrementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link CantoParser#decrement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDecrement(CantoParser.DecrementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link CantoParser#classDecl}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitClassDecl(CantoParser.ClassDeclContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ClassVarDecl}
+	 * labeled alternative in {@link CantoParser#classVar}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitClassVarDecl(CantoParser.ClassVarDeclContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ClassVarInit}
+	 * labeled alternative in {@link CantoParser#classVar}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitClassVarInit(CantoParser.ClassVarInitContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link CantoParser#classMethod}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitClassMethod(CantoParser.ClassMethodContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Public}
+	 * labeled alternative in {@link CantoParser#accessModifier}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPublic(CantoParser.PublicContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code Private}
+	 * labeled alternative in {@link CantoParser#accessModifier}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPrivate(CantoParser.PrivateContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link CantoParser#if}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -123,6 +181,18 @@ public interface CantoVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitUntil(CantoParser.UntilContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link CantoParser#forRange}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForRange(CantoParser.ForRangeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link CantoParser#forEach}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForEach(CantoParser.ForEachContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code Add}
 	 * labeled alternative in {@link CantoParser#expr}.
@@ -309,6 +379,12 @@ public interface CantoVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitType(CantoParser.TypeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link CantoParser#listType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitListType(CantoParser.ListTypeContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link CantoParser#bool}.
 	 * @param ctx the parse tree

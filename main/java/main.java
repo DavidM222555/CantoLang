@@ -12,7 +12,7 @@ import java.io.InputStream;
 
 public class main {
     public static void main(String args[]) throws IOException {
-        String inputFile = "src/SamplePrograms/PE1.ct";
+        String inputFile = "src/SamplePrograms/Factorial.ct";
 
         InputStream is = new FileInputStream(inputFile);
         ANTLRInputStream input = new ANTLRInputStream(is);

@@ -1,0 +1,20 @@
+
+
+func getEvenNumbersToN(maxN : int) -> [int] {
+    let counter : int = 0;
+    let resultList : [int] = [];
+
+    until (counter == maxN) {
+        if (counter % 2 == 0) {
+            resultList ++ counter;
+        }
+
+        counter += 1;
+    }
+
+    return resultList;
+}
+
+for x from 2 to 20 {
+    print(x);
+}

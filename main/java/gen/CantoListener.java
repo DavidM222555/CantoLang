@@ -37,6 +37,104 @@ public interface CantoListener extends ParseTreeListener {
 	 */
 	void exitListConcat(CantoParser.ListConcatContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link CantoParser#listIndex}.
+	 * @param ctx the parse tree
+	 */
+	void enterListIndex(CantoParser.ListIndexContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CantoParser#listIndex}.
+	 * @param ctx the parse tree
+	 */
+	void exitListIndex(CantoParser.ListIndexContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link CantoParser#increment}.
+	 * @param ctx the parse tree
+	 */
+	void enterIncrement(CantoParser.IncrementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CantoParser#increment}.
+	 * @param ctx the parse tree
+	 */
+	void exitIncrement(CantoParser.IncrementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link CantoParser#decrement}.
+	 * @param ctx the parse tree
+	 */
+	void enterDecrement(CantoParser.DecrementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CantoParser#decrement}.
+	 * @param ctx the parse tree
+	 */
+	void exitDecrement(CantoParser.DecrementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link CantoParser#classDecl}.
+	 * @param ctx the parse tree
+	 */
+	void enterClassDecl(CantoParser.ClassDeclContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CantoParser#classDecl}.
+	 * @param ctx the parse tree
+	 */
+	void exitClassDecl(CantoParser.ClassDeclContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ClassVarDecl}
+	 * labeled alternative in {@link CantoParser#classVar}.
+	 * @param ctx the parse tree
+	 */
+	void enterClassVarDecl(CantoParser.ClassVarDeclContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ClassVarDecl}
+	 * labeled alternative in {@link CantoParser#classVar}.
+	 * @param ctx the parse tree
+	 */
+	void exitClassVarDecl(CantoParser.ClassVarDeclContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ClassVarInit}
+	 * labeled alternative in {@link CantoParser#classVar}.
+	 * @param ctx the parse tree
+	 */
+	void enterClassVarInit(CantoParser.ClassVarInitContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ClassVarInit}
+	 * labeled alternative in {@link CantoParser#classVar}.
+	 * @param ctx the parse tree
+	 */
+	void exitClassVarInit(CantoParser.ClassVarInitContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link CantoParser#classMethod}.
+	 * @param ctx the parse tree
+	 */
+	void enterClassMethod(CantoParser.ClassMethodContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CantoParser#classMethod}.
+	 * @param ctx the parse tree
+	 */
+	void exitClassMethod(CantoParser.ClassMethodContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Public}
+	 * labeled alternative in {@link CantoParser#accessModifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterPublic(CantoParser.PublicContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Public}
+	 * labeled alternative in {@link CantoParser#accessModifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitPublic(CantoParser.PublicContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Private}
+	 * labeled alternative in {@link CantoParser#accessModifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterPrivate(CantoParser.PrivateContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Private}
+	 * labeled alternative in {@link CantoParser#accessModifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitPrivate(CantoParser.PrivateContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link CantoParser#if}.
 	 * @param ctx the parse tree
 	 */
@@ -196,6 +294,26 @@ public interface CantoListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitUntil(CantoParser.UntilContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link CantoParser#forRange}.
+	 * @param ctx the parse tree
+	 */
+	void enterForRange(CantoParser.ForRangeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CantoParser#forRange}.
+	 * @param ctx the parse tree
+	 */
+	void exitForRange(CantoParser.ForRangeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link CantoParser#forEach}.
+	 * @param ctx the parse tree
+	 */
+	void enterForEach(CantoParser.ForEachContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CantoParser#forEach}.
+	 * @param ctx the parse tree
+	 */
+	void exitForEach(CantoParser.ForEachContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code Add}
 	 * labeled alternative in {@link CantoParser#expr}.
@@ -514,6 +632,16 @@ public interface CantoListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitType(CantoParser.TypeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link CantoParser#listType}.
+	 * @param ctx the parse tree
+	 */
+	void enterListType(CantoParser.ListTypeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CantoParser#listType}.
+	 * @param ctx the parse tree
+	 */
+	void exitListType(CantoParser.ListTypeContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link CantoParser#bool}.
 	 * @param ctx the parse tree

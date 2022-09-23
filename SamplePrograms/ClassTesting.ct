@@ -1,0 +1,21 @@
+
+struct Hello {
+    pub member1: int;
+    pub member2: int;
+    pub member3: int = 55;
+
+    pub func method1(arg1: int, arg2: int) -> hello {
+        print("In this method");
+    }
+}
+
+let x : int = 0;
+
+let listOfInts : [int] = [];
+
+until (x == 100) {
+    x = x + 1;
+    listOfInts ++ x;
+}
+
+print(listOfInts[3]);

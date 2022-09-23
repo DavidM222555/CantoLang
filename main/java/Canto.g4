@@ -7,9 +7,15 @@ statement   : block
             | assign
             | varDecl
             | funcDecl
+            | classDecl
+            | forEach
+            | forRange
             | if
+            | increment
+            | decrement
             | listConcat
             | expr ';'
+            | listIndex
             | while
             | until
             | return
@@ -18,6 +24,31 @@ statement   : block
 
 listConcat  : ID '++' expr ';'
             ;
+
+listIndex   : ID '[' expr ']' '=' expr ';'
+            ;
+
+increment   : ID '+=' expr ';'
+            ;
+
+decrement   : ID '-=' expr ';'
+            ;
+
+classDecl   : 'struct' ID '{' (classVar | classMethod)* '}'
+            ;
+
+classVar    : accessModifier? ID ':' type ';'           # ClassVarDecl
+            | accessModifier? ID ':' type '=' expr ';'  # ClassVarInit
+            ;
+
+classMethod : accessModifier? funcDecl
+            ;
+
+accessModifier
+            : 'pub'     # Public
+            | 'priv'    # Private
+            ;
+
 
 if          :
             'if' expr statement (elseIf)* (else)?
@@ -73,6 +104,12 @@ until
             : 'until' '(' expr ')' block ;
 
 
+forRange    : 'for' ID 'from' expr 'to' expr ('by' expr)? statement
+            ;
+
+forEach     : 'for' ID 'in' ID statement
+            ;
+
 expr        : ID '(' exprList? ')'  # Call
             | ID '[' INT ']'        # Index
             | '-' expr              # Negate
@@ -109,7 +146,11 @@ type        : 'float'
             | 'bool'
             | 'char'
             | 'string'
+            | listType
             | ID // For handling new user defined types
+            ;
+
+listType    : '[' type ']'
             ;
 
 bool        : 'true'
